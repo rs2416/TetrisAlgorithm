@@ -10,7 +10,7 @@ Python file includes my algorithm, implementing graphs (adjacency lists), by exp
 
 ##### *Performance.py*
 
-Python file allows one to set the size of the randomly generated target and outputs the performance of one's algorithm.
+Python file allows one to set the size of the randomly generated target and outputs the performance of one's algorithm (accuracy and time performance).
 
  ```
  target = utils.generate_target(width=10, height=10, density=0.6)
