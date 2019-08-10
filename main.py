@@ -1,11 +1,12 @@
 
+# NOTE: Tetris pieces can have 19 types of shape, each shape has an identification number, called shapeID. A placed piece should also be denoted as a tuple: (shapeID, pieceID), PieceID ranges from 1 to 𝑛, where 𝑛 is the total number of Tetris pieces used in the tiling solution, while shapeID ranges from 1 to 19.* 
 
 from copy import deepcopy
 from numpy import size
 
 def Tetris(target):
     
-##-------------------------------------------MAKING SOLUTION MATRIX-----------------------------------------------------------------------
+##----MAKING SOLUTION MATRIX
 
     nrows = len(target)                    
     ncols = len(target[0])                                       
@@ -17,12 +18,16 @@ def Tetris(target):
             row.append((0, 0))             
         solution.append(row)
 
-##-------------------------------------------MAKING ANOTHER TARGET USEFUL FOR ADJACENCY LIST------------------------------------------------
+##----MAKING ANOTHER TARGET USEFUL FOR ADJACENCY LIST
+
     target2 = deepcopy(target)
 
     replace = 0
     index = []
-    coordinates = [[]]            #list of coordinates of values, corresponding with value of index - filling list with, one empty sublist - so the indexes match up with the values of the nodes
+    coordinates = [[]]   
+    
+#list of coordinates of values, corresponding with value of index - filling list with, one empty sublist - so the indexes match up with the values of the nodes
+
     for i in range(nrows):
         for j in range(ncols):
             if target[i][j] == 1:
@@ -31,21 +36,22 @@ def Tetris(target):
                 target2[i][j] = replace
                 index.append(replace)         #making a list of target values
 
-   ##------------------------------------------------------MAKING ADJACENCY LIST---------------------------------------------------------------------
+##----MAKING ADJACENCY LIST
 
     adnodes = [(0, -1),
             (1, 0),
             (0, 1),
             (-1, 0)]
 
-    adlist = [[]]                    #filling list with, one empty sublist - so the indexes match up with the values of the nodes
+    adlist = [[]]    
+    #filling list with, one empty sublist - so the indexes match up with the values of the nodes
     numberofneighbours = []                                      
                                                                   
     for i in range(nrows):
         for j in range(ncols):
             neighbours = []
             for k in adnodes: 
-                y = i + k[1]         #ref coordinates of each tuple
+                y = i + k[1]   #ref coordinates of each tuple
                 x = j + k[0]
                 if y < 0 or y >= nrows or x < 0 or x >= ncols:
                     continue
@@ -59,23 +65,22 @@ def Tetris(target):
             if center != 0:
                 adlist.append(neighbours)
 
+##----MAKING A LIST OF NUMBERS OF NEIGHBOURS FOR EACH NODE, NODE = INDEX 
 
-
-##--------------------------------------MAKING A LIST OF NUMBERS OF NEIGHBOURS FOR EACH NODE, NODE = INDEX ---------------------------------
-
-    numneighbours = []               #making a list of numbers of neighbours for each node, node is the index
+    numneighbours = []   #making a list of numbers of neighbours for each node, node is the index
     for i in adlist:
         if size(i) > 0:
           numneighbours.append(size(i))
           
-##---------------------SORTING THE LIST OF NEIGHBOURS FOR EACH NODE FROM LOWEST NEIGHBOURS TO HIGHEST, WITH NODES SORTED IN SAME WAY---------
+##----SORTING THE LIST OF NEIGHBOURS FOR EACH NODE FROM LOWEST NEIGHBOURS TO HIGHEST, WITH NODES SORTED IN SAME WAY
 
-    orderedlengths, orderedneighboursqueue = (list(c) for c in zip(*sorted(zip(numneighbours,index))))   #sorting the nodes the same way the number of neighbours for each nodes are sorted - therefore a list of nodes, with least neighbours to most neighbours
+    orderedlengths, orderedneighboursqueue = (list(c) for c in zip(*sorted(zip(numneighbours,index))))   
+#sorting the nodes the same way the number of neighbours for each nodes are sorted - therefore a list of nodes, with least neighbours to most neighbours
 
     squares = [] #list for 4 coordinates to fill
     piece = 0  #piece count
 
-##----------------------------------------PICKING FOUR COORDINATES FOR A SHAPE, WITH PRIORITY FOR LOWEST NEIGHBOURS-------------------------
+##----PICKING FOUR COORDINATES FOR A SHAPE, WITH PRIORITY FOR LOWEST NEIGHBOURS
  
     while len(orderedneighboursqueue) > 0:      
 
@@ -83,23 +88,23 @@ def Tetris(target):
         set_of_neighbours = set()
         current_square = orderedneighboursqueue[0]
         squares.append(coordinates[current_square])                 
-        set_of_neighbours.update(adlist[current_square])                                                                                                                          #making a set of each neighbour's neighbours so when get to an edge you don't miss the fourth square
-        orderedneighboursqueue.remove(current_square)                                                                                                                                #removing the current used square from the 'queue'
+        set_of_neighbours.update(adlist[current_square])                                                                                         #making a set of each neighbour's neighbours so when get to an edge you don't miss the fourth square
+        orderedneighboursqueue.remove(current_square)                                                                                           #removing the current used square from the 'queue'
         
-        for neigh in adlist[current_square]:                                                                                                                                          #removing the current used square from the adjacency list, so it is no longer a neighbour to others
+        for neigh in adlist[current_square]:                                                                                                         #removing the current used square from the adjacency list, so it is no longer a neighbour to others
             adlist[neigh].remove(current_square)
         
                  
-        while len(squares) < 4:                                                                                                                                                         #making sure 'squares' (coordinate list) is filled with only 4 coordinates
+        while len(squares) < 4:                                                                                                                     #making sure 'squares' (coordinate list) is filled with only 4 coordinates
             best_neighbour = None                          
             low_neighbours = None
             for neighbour in set_of_neighbours:                                                         
                 number_neighbours = len(adlist[neighbour])
-                if coordinates[neighbour] not in squares:                                                                                                                                 # making sure I don't repeat coordinates         
+                if coordinates[neighbour] not in squares:                                                                                                   # making sure I don't repeat coordinates         
                     if low_neighbours is None or number_neighbours < low_neighbours: 
                         best_neighbour = neighbour
                         low_neighbours = number_neighbours        
-            if best_neighbour is not None:                                                                                                                                                   #ranking neighbours, lowest neighbour is the best neighbour                                     
+            if best_neighbour is not None:                                                                                                               #ranking neighbours                                 
                 squares.append(coordinates[best_neighbour])          
                 set_of_neighbours.update(adlist[best_neighbour])
                 current_square = best_neighbour
@@ -109,17 +114,17 @@ def Tetris(target):
                     adlist[neigh].remove(current_square)
                              
  
-            else:                                                                                                                                                                                 #breaking incase can't find 4 coordinates to fill  
+            else:                                                                                                                                       #breaking incase can't find 4 coordinates to fill  
                 break
             
-##-----------------TURNING COORDINATES INTO RELATIVE COORDINATES AND MATCHING THEM TO SHAPE IDS AND FILLING SOLUTION WITH TUPLES---------
+##----TURNING COORDINATES INTO RELATIVE COORDINATES AND MATCHING THEM TO SHAPE IDS AND FILLING SOLUTION WITH TUPLES
             
             if len(squares) == 4:
 
-                coords = sorted(squares)       #sorting the list of coordinates
-                fill = deepcopy(coords)        #copying the sorted coordinates
+                coords = sorted(squares)     #sorting the list of coordinates
+                fill = deepcopy(coords)      #copying the sorted coordinates
 
-                x = fill[0][0]                 #making relative coordinates
+                x = fill[0][0]               #making relative coordinates
                 y = fill[0][1]
 
                 fill[1][0] = fill[1][0] - x
