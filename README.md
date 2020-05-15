@@ -6,7 +6,7 @@ To design an python algorithm to solve the tetriling puzzle, with the objective 
 
 ##### *Main.py* 
 
-Python file includes my algorithm, implementing graphs (adjacency lists), by expressing the target region as an undirected graph and the squares as nodes. Through the use of adjacency lists I was able to identify and approach the nodes/squares with the least edges/neighbours first, allowing me to have successful performance in comparison to the brute force method that I initially explored.
+Python file includes my algorithm, implementing adjacency lists. Through the use of adjacency lists I was able to identify and approach the nodes/squares with the least edges/neighbours first, allowing me to have successful performance in comparison to the brute force method that I initially explored.
 
 ##### *Performance.py*
 
